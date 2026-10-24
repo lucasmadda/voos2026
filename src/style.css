@@ -1,0 +1,58 @@
+@import url("observablehq:default.css");
+@import url("observablehq:theme-near-midnight.css");
+@import url("observablehq:theme-alt.css");
+@import url("observablehq:theme-wide.css");
+
+/* Tokens da paleta de referência (skill dataviz), steps para superfície escura */
+:root {
+  --series-1: #3987e5; /* azul   → Azul */
+  --series-2: #d95926; /* laranja→ GOL */
+  --series-3: #199e70; /* aqua   → LATAM */
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+  --series-other: #898781;
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+  --seq-100: #cde2fb; --seq-250: #86b6ef; --seq-400: #3987e5; --seq-550: #1c5cab; --seq-700: #0d366b;
+  --ink-muted: #898781;
+  --grid: #2c2c2a;
+  --neutral-scheduled: #5a5955;
+  --neutral-done: #898781;
+}
+
+body { font-variant-numeric: proportional-nums; }
+h1 { letter-spacing: -0.01em; }
+.muted { color: var(--theme-foreground-muted); }
+.faint { color: var(--theme-foreground-faint); }
+.small { font-size: 0.85rem; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.kpi { padding: 0.9rem 1rem; border: 1px solid var(--theme-foreground-faintest); border-radius: 8px; background: var(--theme-background-alt); }
+.kpi .kpi-label { font-size: 0.8rem; color: var(--theme-foreground-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.kpi .kpi-value { font-size: 2rem; font-weight: 600; line-height: 1.15; margin-top: 0.2rem; }
+.kpi .kpi-sub { font-size: 0.8rem; color: var(--theme-foreground-muted); margin-top: 0.15rem; }
+.kpi.tone-critical .kpi-value { color: var(--status-critical); }
+.kpi.tone-warning .kpi-value { color: var(--status-warning); }
+.kpi.tone-serious .kpi-value { color: var(--status-serious); }
+
+.badge { display: inline-block; padding: 0.05rem 0.45rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; line-height: 1.4; color: #0b0b0b; }
+.badge-cancelado { background: var(--status-critical); color: #fff; }
+.badge-atrasado { background: var(--status-warning); }
+.badge-alternado { background: var(--status-serious); }
+.badge-realizado { background: var(--neutral-done); color: #fff; }
+.badge-previsto { background: var(--neutral-scheduled); color: #fff; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.8rem; color: var(--theme-foreground-muted); margin: 0.25rem 0 0.5rem; }
+.legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
+
+.note { border-left: 3px solid var(--series-1); padding: 0.5rem 0.9rem; background: var(--theme-background-alt); border-radius: 0 6px 6px 0; }
+.note.warn { border-left-color: var(--status-warning); }
+.alert-card { border: 1px solid var(--theme-foreground-faintest); border-radius: 8px; padding: 0.6rem 0.9rem; margin: 0.4rem 0; }
+.alert-card .sev { font-weight: 600; }
+figure { margin: 0; }

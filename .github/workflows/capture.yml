@@ -1,0 +1,40 @@
+name: capture
+
+# Arquiva o painel da Fraport (POA/FOR), avisos INMET e malha SIROS do dia a cada 30 min.
+# A janela do painel é de ~48 h, então o histórico só existe se for arquivado continuamente.
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: capture
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Capturar snapshots
+        env:
+          PYTHONPATH: pipeline
+        run: python -m voos.capture --site POA --site FOR --inmet --siros-diario
+      - name: Commit do arquivo
+        run: |
+          git config user.name "voos2026-bot"
+          git config user.email "voos2026-bot@users.noreply.github.com"
+          git add data/archive
+          if git diff --cached --quiet; then echo "nada novo"; exit 0; fi
+          git commit -m "capture: snapshots $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase --autostash origin main || true
+          git push
