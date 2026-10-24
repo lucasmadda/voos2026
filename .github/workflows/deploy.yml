@@ -3,8 +3,9 @@ name: deploy
 # Constrói o site (loaders Python + Observable Framework) e publica no GitHub Pages.
 # Roda a cada push em main (inclusive os commits de captura) e uma vez por dia.
 on:
-  push:
-    branches: [main]
+  # push em main fica desligado até o GitHub Pages ser habilitado (ver HANDOFF.md)
+  # push:
+  #   branches: [main]
   schedule:
     - cron: "15 10 * * *"
   workflow_dispatch:

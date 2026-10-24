@@ -154,12 +154,12 @@ def _download(url: str, dest: Path, force: bool) -> Path:
         _throttle()
         try:
             path = cached_download(url, dest, force=force)
-        except httpx.HTTPStatusError as e:
-            status = e.response.status_code
-            if status not in RETRY_STATUS or attempt == len(RETRY_WAITS_S):
+        except (httpx.HTTPStatusError, httpx.TransportError) as e:
+            retryable = isinstance(e, httpx.TransportError) or e.response.status_code in RETRY_STATUS
+            if not retryable or attempt == len(RETRY_WAITS_S):
                 raise
             last_err = e
-            log(f"IEM respondeu {status}; esperando {RETRY_WAITS_S[attempt]}s antes de tentar de novo")
+            log(f"IEM: {e!r}; esperando {RETRY_WAITS_S[attempt]}s antes de tentar de novo")
             time.sleep(RETRY_WAITS_S[attempt])
             force = True
             continue

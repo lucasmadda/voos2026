@@ -199,3 +199,32 @@ def test_inmet_alert():
     assert r["ufs"] == ["MG", "PR", "SP", "ES"] and r["n_municipios"] == 3 and r["geocodes"] == ["3100104", "3100203", "4100103"]
     assert r["cor"] == "#FFFE00" and r["grupo"] == "hoje" and r["inicio_utc"] == "2026-10-24T03:01:00Z"
     assert "poligono" not in r and "municipios" not in r and "icone" not in r
+
+
+# --------------------------------------------------------------------------- robustez do arquivo
+def test_corrupt_snapshot_is_skipped(tmp_path, monkeypatch):
+    import gzip, json
+    monkeypatch.setattr(live, "ARCHIVE", tmp_path)
+    d = tmp_path / "fraport" / "POA" / "2026-10-24"
+    d.mkdir(parents=True)
+    env = {"source": "fraport", "site": "POA", "fetched_at": "2026-10-24T20:00:00+00:00",
+           "payload": {"departures": [dep("G31979", "2026-10-24 22:00:00", "Previsto")], "arrivals": []}}
+    with gzip.open(d / "20261024T200000Z.json.gz", "wt", encoding="utf-8") as g:
+        json.dump(env, g)
+    (d / "20261024T201500Z.json.gz").write_bytes(b"\x1f\x8b\x08\x00trunc")  # captura em andamento
+    assert [p.name for p in live.list_snapshots("POA")] == ["20261024T200000Z.json.gz", "20261024T201500Z.json.gz"]
+    got = list(live.iter_snapshots("POA"))
+    assert len(got) == 1 and got[0][1] == "2026-10-24T20:00:00Z"
+    tbl = live.fraport_latest()
+    assert tbl.num_rows == 1 and tbl.schema == live.LATEST_SCHEMA
+    assert live.fraport_events().num_rows == 1
+    a = live.asof()
+    assert a["fraport"]["POA"]["n_snapshots"] == 2 and a["fraport"]["POA"]["fetched_at"] == "2026-10-24T20:00:00Z"
+    assert a["fraport"]["FOR"] is None and a["inmet"] is None and a["siros_diario"] is None
+
+
+def test_empty_archive(tmp_path, monkeypatch):
+    monkeypatch.setattr(live, "ARCHIVE", tmp_path)
+    assert live.fraport_latest().num_rows == 0 and live.fraport_events().num_rows == 0
+    assert live.siros_today().num_rows == 0 and live.siros_today().schema == live.SIROS_SCHEMA
+    assert live.inmet_alerts()["n_alerts"] == 0

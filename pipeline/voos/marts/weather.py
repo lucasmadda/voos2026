@@ -217,7 +217,7 @@ def parse_asos_many(csv_paths: Sequence[Path | str]) -> pa.Table:
     if "station" not in present or "valid" not in present:
         log(f"IEM: CSV sem colunas station/valid ({sorted(present)[:6]}…); devolvendo tabela vazia")
         return REPORT_SCHEMA.empty_table()
-    table = con.execute(_parse_sql(paths, present), {"paths": paths}).arrow()
+    table = con.execute(_parse_sql(paths, present), {"paths": paths}).to_arrow_table()
     return table.cast(REPORT_SCHEMA)
 
 
@@ -269,7 +269,7 @@ def hourly_from_reports(reports: pa.Table) -> pa.Table:
         FROM reports
         GROUP BY icao, hour_utc
         ORDER BY icao, hour_utc
-    """).arrow()
+    """).to_arrow_table()
     return table.cast(HOURLY_SCHEMA)
 
 
@@ -303,7 +303,7 @@ def daily_from_hourly(hourly: pa.Table) -> pa.Table:
         FROM h
         GROUP BY icao, date_local
         ORDER BY icao, date_local
-    """).arrow()
+    """).to_arrow_table()
     return table.cast(DAILY_SCHEMA)
 
 

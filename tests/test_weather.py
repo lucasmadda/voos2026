@@ -73,7 +73,7 @@ def reports(tmp_path_factory) -> dict:
 
 
 def test_dedup_and_shape(reports):
-    assert len(reports) == 11  # 12 linhas de dados, 1 duplicada
+    assert len(reports) == 10  # 11 linhas de dados, 1 duplicada
 
 
 def test_imc_not_red(reports):
@@ -157,11 +157,14 @@ def test_daily_local_date(reports):
     daily = daily_from_hourly(hourly_from_reports(table))
     assert daily.schema.equals(DAILY_SCHEMA)
     rows = {(r["icao"], r["date_local"]): r for r in daily.to_pylist()}
-    # SBFN (Noronha, UTC−2): 01:00Z e 02:00Z de 24/10 ainda são 23/10 local
+    # SBFN (Noronha, UTC−2): 01:00Z de 24/10 ainda é 23/10 local; 02:00Z já é 00:00 de 24/10
     assert local_day(datetime(2026, 10, 24, 1, 0, tzinfo=timezone.utc), "SBFN") == date(2026, 10, 23)
-    fn = rows[("SBFN", "2026-10-23")]
-    assert fn["n_hours"] == 2 and fn["hours_convective"] == 1 and fn["hours_imc"] == 1
-    assert ("SBFN", "2026-10-24") not in rows
+    assert local_day(datetime(2026, 10, 24, 2, 0, tzinfo=timezone.utc), "SBFN") == date(2026, 10, 24)
+    fn23, fn24 = rows[("SBFN", "2026-10-23")], rows[("SBFN", "2026-10-24")]
+    assert fn23["n_hours"] == 1 and fn23["hours_convective"] == 0 and fn23["hours_imc"] == 0 and fn23["max_severity"] == 0
+    assert fn24["n_hours"] == 1 and fn24["hours_convective"] == 1 and fn24["hours_imc"] == 1 and fn24["min_vis_m"] == 4000
+    # em São Paulo (UTC−3) 02:00Z de 24/10 ainda seria 23/10
+    assert local_day(datetime(2026, 10, 24, 2, 0, tzinfo=timezone.utc), "SBPA") == date(2026, 10, 23)
     poa = rows[("SBPA", "2026-10-24")]
     assert poa["n_hours"] == 2 and poa["hours_imc"] == 2 and poa["hours_red"] == 1 and poa["hours_convective"] == 1
     assert poa["min_vis_m"] == 1200 and poa["min_ceiling_ft"] == 900 and poa["max_severity"] == 2
