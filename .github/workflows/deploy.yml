@@ -1,0 +1,75 @@
+name: deploy
+
+# Constrói o site (loaders Python + Observable Framework) e publica no GitHub Pages.
+# Roda a cada push em main (inclusive os commits de captura) e uma vez por dia.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "15 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Dependências Python
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -q -e .
+      - name: Cache de downloads brutos (VRA, IEM, TSE, IBGE…)
+        uses: actions/cache@v4
+        with:
+          path: data/raw
+          key: raw-${{ hashFiles('pipeline/voos/config.py') }}-${{ github.run_number }}
+          restore-keys: |
+            raw-${{ hashFiles('pipeline/voos/config.py') }}-
+            raw-
+      - name: Cache de marts históricos e dimensões do Framework
+        uses: actions/cache@v4
+        with:
+          path: |
+            src/.observablehq/cache/data/dims
+            src/.observablehq/cache/data/hist
+          key: framework-${{ hashFiles('pipeline/voos/**/*.py', 'src/data/dims/*', 'src/data/hist/*') }}-${{ github.run_number }}
+          restore-keys: |
+            framework-${{ hashFiles('pipeline/voos/**/*.py', 'src/data/dims/*', 'src/data/hist/*') }}-
+      - run: npm ci
+      - name: Forçar reexecução dos loaders ao vivo
+        run: rm -rf src/.observablehq/cache/data/live
+      - name: Build
+        env:
+          VOOS_GUARDS_STRICT: "1"
+        run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
