@@ -1,0 +1,31 @@
+source,status_raw,status_canon,event_class,status_kind,confidence,definition
+fraport,Previsto,scheduled,ScheduledLeg,provisório,1.0,Voo programado sem alteração informada pelo painel do aeroporto
+fraport,Confirmado,confirmed,ScheduledLeg,provisório,1.0,Operação confirmada pela companhia no painel
+fraport,Embarque próximo,boarding,FlightLeg,provisório,1.0,Embarque prestes a começar
+fraport,Embarque,boarding,FlightLeg,provisório,1.0,Embarque em andamento
+fraport,Última chamada,boarding,FlightLeg,provisório,1.0,Última chamada de embarque
+fraport,Embarque encerrado,boarding,FlightLeg,provisório,1.0,Portão fechado
+fraport,Decolagem,departed,FlightLeg,provisório,1.0,Aeronave decolou (sem horário real no painel)
+fraport,Pousado,landed,FlightLeg,provisório,1.0,Aeronave pousou (chegadas)
+fraport,Atrasado,delayed,Delay,provisório,0.9,Painel informa atraso; minutos = estimado − previsto original
+fraport,Cancelado,cancelled,OperationalCancellation,provisório,0.9,Cancelamento declarado no painel do operador do aeroporto; oficial só no VRA
+fraport,Alternado,diverted,Diversion,provisório,0.9,Voo alternou para outro aeródromo
+fraport,On time,scheduled,ScheduledLeg,provisório,1.0,Equivalente em inglês de Previsto
+fraport,Confirmed,confirmed,ScheduledLeg,provisório,1.0,Equivalente em inglês de Confirmado
+fraport,Boarding,boarding,FlightLeg,provisório,1.0,Equivalente em inglês de Embarque
+fraport,Final Call,boarding,FlightLeg,provisório,1.0,Equivalente em inglês de Última chamada
+fraport,Gate closed,boarding,FlightLeg,provisório,1.0,Equivalente em inglês de Embarque encerrado
+fraport,Departed,departed,FlightLeg,provisório,1.0,Equivalente em inglês de Decolagem
+fraport,Landed,landed,FlightLeg,provisório,1.0,Equivalente em inglês de Pousado
+fraport,Delayed,delayed,Delay,provisório,0.9,Equivalente em inglês de Atrasado
+fraport,Cancelled,cancelled,OperationalCancellation,provisório,0.9,Equivalente em inglês de Cancelado
+fraport,Diverted,diverted,Diversion,provisório,0.9,Equivalente em inglês de Alternado
+vra,REALIZADO,operated,FlightLeg,oficial,1.0,Etapa realizada (ANAC VRA)
+vra,CANCELADO,cancelled,OperationalCancellation,oficial,1.0,Etapa básica prevista não realizada (Res. ANAC 218/2012)
+vra,NÃO INFORMADO,unknown,FlightLeg,oficial,0.5,Situação não informada pela companhia (não observado desde 2020)
+siros,withdrawn,schedule_withdrawn,ScheduleWithdrawal,provisório,0.8,Trecho presente em snapshot anterior da malha e ausente no snapshot do dia
+flightaware,cancelled,cancelled,OperationalCancellation,provisório,0.7,"FlightAware: 'no longer tracked' — usualmente, não sempre, cancelamento da companhia"
+aerodatabox,Canceled,cancelled,OperationalCancellation,provisório,0.8,AeroDataBox: cancelado
+aerodatabox,CanceledUncertain,cancelled,OperationalCancellation,provisório,0.5,AeroDataBox: provável cancelamento
+aerodatabox,Delayed,delayed,Delay,provisório,0.8,AeroDataBox: atrasado
+aerodatabox,Diverted,diverted,Diversion,provisório,0.8,AeroDataBox: alternado

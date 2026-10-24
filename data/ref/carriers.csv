@@ -1,0 +1,10 @@
+iata,icao,name,group,slot
+G3,GLO,GOL Linhas Aéreas,GOL,2
+AD,AZU,Azul Linhas Aéreas,Azul,1
+2F,ACN,Azul Conecta,Azul,1
+LA,TAM,LATAM Airlines Brasil,LATAM,3
+JJ,TAM,LATAM Airlines Brasil,LATAM,3
+2Z,PTB,VoePass Linhas Aéreas,outras,0
+,SID,Sideral Linhas Aéreas,outras,0
+,MWM,Modern Logistics,outras,0
+,TTL,Total Linhas Aéreas,outras,0

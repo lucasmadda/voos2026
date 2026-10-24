@@ -1,0 +1,15 @@
+{
+  "name": "voos2026",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "dev": "observable preview",
+    "build": "observable build",
+    "clean": "observable clean",
+    "palette": "node scripts/validate_palette.js"
+  },
+  "devDependencies": {
+    "@observablehq/framework": "1.13.4"
+  }
+}
