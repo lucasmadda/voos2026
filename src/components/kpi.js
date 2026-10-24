@@ -13,8 +13,8 @@ export function kpiGrid(items) {
   return html`<div class="kpi-grid">${items.map(kpi)}</div>`;
 }
 
-export function badge(group, label) {
-  return html`<span class="badge badge-${group}">${label ?? group}</span>`;
+export function badge(group, label, title) {
+  return html`<span class="badge badge-${group}" title=${title ?? label ?? group}>${label ?? group}</span>`;
 }
 
 export function legend(entries) {

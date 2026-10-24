@@ -24,7 +24,7 @@ export function severityStrip(metar, {stations, day, width, tzOffsetHours = -3, 
     marginRight: 10,
     padding: 0.08,
     style: {fontSize: "12px"},
-    x: {domain: Array.from({length: 24}, (_, i) => i), tickFormat: (h) => `${String(h).padStart(2, "0")}h`, label: null},
+    x: {domain: Array.from({length: 24}, (_, i) => i), tickFormat: (h) => (h % 3 === 0 ? `${String(h).padStart(2, "0")}h` : ""), label: null},
     y: {domain: stations, label: null, tickFormat: (s) => labels[s] ?? s},
     color: {domain: [0, 1, 2, 3], range: SEVERITY_COLOR, legend: true, tickFormat: (s) => SEVERITY_LABEL[s]},
     marks: [

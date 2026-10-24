@@ -16,7 +16,9 @@ export function flightsTimeline(flights, metar, {day, width, tzOffsetHours = -3,
     .filter((d) => d.t >= new Date(dayStart.getTime() - 3600e3) && d.t <= dayEnd)
     .sort((a, b) => a.t - b.t)
     .map((d, i, arr) => ({...d, t1: arr[i + 1]?.t ?? new Date(Math.min(d.t.getTime() + 3600e3, dayEnd.getTime()))}));
-  const pts = flights.map((d) => ({...d, t: parseLocal(d.sched_local), group: statusGroup(d)}));
+  const pts = flights
+    .map((d) => ({...d, t: parseLocal(d.sched_local), group: statusGroup(d)}))
+    .sort((a, b) => STATUS_ORDER.indexOf(a.group) - STATUS_ORDER.indexOf(b.group)); // cancelado/alternado desenhados por cima
   const lanes = CARRIER_ORDER.filter((g) => pts.some((p) => p.carrier_group === g));
   return Plot.plot({
     width,
@@ -34,7 +36,6 @@ export function flightsTimeline(flights, metar, {day, width, tzOffsetHours = -3,
       }),
       Plot.dot(pts, {
         x: "t", y: "carrier_group", fill: "group", r: 6.5, stroke: "var(--theme-background)", strokeWidth: 1.5,
-        sort: {channel: "fill", order: STATUS_ORDER},
         tip: true,
         title: (d) => `${d.flight_code_raw} → ${d.other_city ?? d.other_iata} (${d.other_iata})\nprevisto ${fmtHHMM(d.sched_local)} · estimado ${fmtHHMM(d.est_local)} · ${fmtDelay(d.delay_min)}\nstatus: ${d.status_raw}`
       }),

@@ -25,8 +25,11 @@
   --neutral-done: #898781;
 }
 
+:root { --serif: var(--sans-serif); }
+body, h1, h2, h3, h4, .note, .card { font-family: var(--sans-serif); }
 body { font-variant-numeric: proportional-nums; }
-h1 { letter-spacing: -0.01em; }
+h1 { letter-spacing: -0.015em; font-weight: 650; }
+h2 { font-weight: 600; }
 .muted { color: var(--theme-foreground-muted); }
 .faint { color: var(--theme-foreground-faint); }
 .small { font-size: 0.85rem; }

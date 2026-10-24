@@ -32,6 +32,17 @@ export const STATUS_COLOR = {
 };
 export const statusColor = (s) => STATUS_COLOR[s] ?? STATUS_COLOR.previsto;
 
+/** Rótulo curto do status cru do painel (cabe na coluna da tabela; o cru fica no title). */
+const SHORT_STATUS = {
+  "Previsto": "previsto", "Confirmado": "confirmado", "Embarque próximo": "embarque", "Embarque": "embarque",
+  "Última chamada": "embarque", "Embarque encerrado": "embarque", "Decolagem": "decolou", "Pousado": "pousou",
+  "Atrasado": "atrasado", "Cancelado": "cancelado", "Alternado": "alternado",
+  "On time": "previsto", "Confirmed": "confirmado", "Boarding": "embarque", "Final Call": "embarque",
+  "Gate closed": "embarque", "Departed": "decolou", "Landed": "pousou", "Delayed": "atrasado",
+  "Cancelled": "cancelado", "Diverted": "alternado"
+};
+export const shortStatus = (raw) => SHORT_STATUS[raw] ?? (raw ?? "—").toLowerCase();
+
 /** Agrupa um voo normalizado da Fraport em um dos 5 grupos de status. */
 export function statusGroup(d) {
   const c = d.status_canon;

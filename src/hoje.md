@@ -7,8 +7,8 @@ title: Hoje e amanhã
 ```js
 import {rows} from "./components/arrow.js";
 import {kpiGrid, badge, legend} from "./components/kpi.js";
-import {statusGroup, STATUS_ORDER, STATUS_LABEL, STATUS_COLOR, CARRIER_ORDER} from "./components/palette.js";
-import {fmtHHMM, fmtDate, fmtDateLong, fmtStamp, pct, fmtInt, fmtDelay, todaySaoPaulo} from "./components/format.js";
+import {statusGroup, shortStatus, STATUS_ORDER, STATUS_LABEL, STATUS_COLOR, CARRIER_ORDER} from "./components/palette.js";
+import {fmtHHMM, fmtDate, fmtDateLong, fmtStamp, fmtStampShort, pct, fmtInt, fmtDelay, todaySaoPaulo} from "./components/format.js";
 import {flightsTimeline} from "./components/dayTimeline.js";
 import {severityStrip} from "./components/weatherStrip.js";
 import {fetchFraportLive} from "./components/fraportLive.js";
@@ -99,10 +99,10 @@ display(flightsTimeline(flights, metarSite, {day, width, airportLabel: SITE_ICAO
 
 ```js
 display(Inputs.table(flights, {
-  columns: ["flight_code_raw", "carrier_group", "other_city", "other_uf", "other_regiao", "sched_local", "est_local", "delay_min", "status_raw", "gate"],
-  header: {flight_code_raw: "voo", carrier_group: "cia", other_city: direction === "dep" ? "destino" : "origem", other_uf: "UF", other_regiao: "região", sched_local: "previsto", est_local: "estimado", delay_min: "atraso", status_raw: "status", gate: "portão"},
-  format: {sched_local: fmtHHMM, est_local: fmtHHMM, delay_min: fmtDelay, status_raw: (s, i, data) => badge(data[i].group, s), other_regiao: (r) => r ?? "—", other_uf: (u) => u ?? "—"},
-  width: {flight_code_raw: 70, carrier_group: 60, other_uf: 40, other_regiao: 60, sched_local: 70, est_local: 70, delay_min: 90, gate: 60},
+  columns: ["flight_code_raw", "carrier_group", "other_city", "other_uf", "other_regiao", "sched_local", "est_local", "delay_min", "status_raw"],
+  header: {flight_code_raw: "voo", carrier_group: "cia", other_city: direction === "dep" ? "destino" : "origem", other_uf: "UF", other_regiao: "região", sched_local: "previsto", est_local: "estimado", delay_min: "atraso", status_raw: "status"},
+  format: {sched_local: fmtHHMM, est_local: fmtHHMM, delay_min: fmtDelay, status_raw: (s, i, data) => badge(data[i].group, shortStatus(s), s), other_regiao: (r) => r ?? "—", other_uf: (u) => u ?? "—"},
+  width: {flight_code_raw: 64, carrier_group: 52, other_uf: 36, other_regiao: 52, sched_local: 60, est_local: 62, delay_min: 78},
   rows: 40, layout: "auto", sort: "sched_local"
 }));
 ```
@@ -140,7 +140,7 @@ const hubByGroup = d3.rollup(hubLegs, (v) => v.length, (d) => d.group);
   <div class="card">
     <h3>Malha registrada na ANAC (SIROS) para ${fmtDate(siros[0]?.snapshot_date)}</h3>
     <p class="muted small">Trechos ${SITE_ICAO[site]} → Nordeste planejados no snapshot diário do SIROS (UTC). O que estava na malha e sumiu do painel é remoção prévia, não cancelamento.</p>
-    ${sirosNE.length ? Inputs.table(sirosNE, {columns: ["carrier_icao", "flight_number", "equipment", "seats", "dest_icao", "sched_dep_utc", "codeshare"], header: {carrier_icao: "cia", flight_number: "voo", equipment: "equip.", seats: "assentos", dest_icao: "destino", sched_dep_utc: "partida (UTC)", codeshare: "codeshare"}, format: {sched_dep_utc: (s) => s?.slice(11, 16)}, rows: 10}) : html`<p class="muted">nenhum trecho direto registrado</p>`}
+    ${sirosNE.length ? Inputs.table(sirosNE, {columns: ["carrier_icao", "flight_number", "equipment", "seats", "dest_icao", "sched_dep_utc"], header: {carrier_icao: "cia", flight_number: "voo", equipment: "equip.", seats: "assentos", dest_icao: "destino", sched_dep_utc: "partida UTC"}, format: {sched_dep_utc: (s) => s?.slice(11, 16)}, rows: 10, layout: "auto"}) : html`<p class="muted">nenhum trecho direto registrado</p>`}
   </div>
   <div class="card">
     <h3>Conexões possíveis: partidas para hubs em ${fmtDate(day)}</h3>
@@ -159,8 +159,8 @@ const siteEvents = events
 display(siteEvents.length
   ? Inputs.table(siteEvents, {
       columns: ["changed_at", "direction", "flight_code_raw", "carrier_group", "other_iata", "sched_local", "field", "from_value", "to_value"],
-      header: {changed_at: "observado em", direction: "sentido", flight_code_raw: "voo", carrier_group: "cia", other_iata: "para/de", sched_local: "previsto", field: "campo", from_value: "de", to_value: "para"},
-      format: {changed_at: fmtStamp, direction: (d) => (d === "dep" ? "partida" : "chegada"), sched_local: (s) => `${fmtDate(s?.slice(0, 10))} ${fmtHHMM(s)}`},
+      header: {changed_at: "observado (BRT)", direction: "sentido", flight_code_raw: "voo", carrier_group: "cia", other_iata: "para/de", sched_local: "previsto", field: "campo", from_value: "de", to_value: "para"},
+      format: {changed_at: fmtStampShort, direction: (d) => (d === "dep" ? "partida" : "chegada"), sched_local: (s) => `${fmtDate(s?.slice(0, 10))} ${fmtHHMM(s)}`},
       rows: 20, layout: "auto"
     })
   : html`<p class="muted">Ainda não há transições registradas: elas aparecem conforme o capturador (a cada 15 min) observa mudanças de status ou de horário estimado. Snapshots de ${site}: ${asof?.fraport?.[site]?.n_snapshots ?? 0}.</p>`);
@@ -189,7 +189,7 @@ const refresh = view(Inputs.button("Buscar painel ao vivo agora"));
 const live = refresh > 0 ? await fetchFraportLive(site) : null;
 display(live
   ? html`<div><p class="muted small">Lido às ${live.fetched_at.toLocaleTimeString("pt-BR", {timeZone: "America/Sao_Paulo"})} (horário de Brasília) · ${live.rows.length} voos</p>
-      ${Inputs.table(live.rows.filter((d) => d.direction === "dep"), {columns: ["flight_code_raw", "carrier_group", "other_city", "other_uf", "scheduled_time", "estimated_time", "status_raw", "gate"], header: {flight_code_raw: "voo", carrier_group: "cia", other_city: "destino", other_uf: "UF", scheduled_time: "previsto", estimated_time: "estimado", status_raw: "status", gate: "portão"}, rows: 30})}</div>`
+      ${Inputs.table(live.rows.filter((d) => d.direction === "dep"), {columns: ["flight_code_raw", "carrier_group", "other_city", "other_uf", "sched_date_local", "scheduled_time", "estimated_time", "status_raw"], header: {flight_code_raw: "voo", carrier_group: "cia", other_city: "destino", other_uf: "UF", sched_date_local: "dia", scheduled_time: "previsto", estimated_time: "estimado", status_raw: "status"}, format: {sched_date_local: fmtDate}, rows: 30, layout: "auto"})}</div>`
   : html`<p class="muted small">clique para buscar</p>`);
 ```
 

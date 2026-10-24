@@ -18,6 +18,11 @@ export const fmtStamp = (iso) => {
   const d = new Date(iso);
   return d.toLocaleString("pt-BR", {timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"}) + " (horário de Brasília)";
 };
+// Carimbo curto "dd/mm HH:MM" em horário de Brasília (para colunas de tabela)
+export const fmtStampShort = (iso) => {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("pt-BR", {timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"});
+};
 export const pct = (num, den, digits = 1) => (den ? `${((100 * num) / den).toFixed(digits).replace(".", ",")} %` : "—");
 export const fmtInt = (n) => (n == null ? "—" : n.toLocaleString("pt-BR"));
 export const fmtDelay = (m) => (m == null ? "—" : m > 0 ? `+${m} min` : m < 0 ? `${m} min` : "no horário");

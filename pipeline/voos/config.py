@@ -63,10 +63,11 @@ NE_AIRPORTS = [
     "SBSV", "SBRF", "SBFZ", "SBSG", "SBMO", "SBJP", "SBAR", "SBSL", "SBTE",
     "SBPS", "SBIL", "SBPL", "SBJU", "SBVC", "SBKG", "SBFN", "SBIZ",
 ]
-HUB_AIRPORTS = [
-    "SBGR", "SBSP", "SBKP", "SBBR", "SBGL", "SBRJ", "SBCF", "SBCT", "SBFL", "SBNF", "SBGO",
-]
-AIRPORTS = [FOCUS_ORIGIN] + NE_AIRPORTS + HUB_AIRPORTS
+# Hubs de conexão para o Nordeste (is_hub, trechos de interesse): GRU, CGH, VCP, BSB, GIG, SDU, CNF
+HUB_AIRPORTS = ["SBGR", "SBSP", "SBKP", "SBBR", "SBGL", "SBRJ", "SBCF"]
+# Outras estações METAR acompanhadas (destinos frequentes de POA; não são hubs para o NE)
+OTHER_STATIONS = ["SBCT", "SBFL", "SBNF", "SBGO"]
+AIRPORTS = [FOCUS_ORIGIN] + NE_AIRPORTS + HUB_AIRPORTS + OTHER_STATIONS
 # Estações METAR (IEM): SBVC não existe no IEM (só REDEMET)
 IEM_STATIONS = [a for a in AIRPORTS if a != "SBVC"]
 
