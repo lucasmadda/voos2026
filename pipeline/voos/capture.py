@@ -175,10 +175,15 @@ def capture_siros_diario(archive: Path = ARCHIVE) -> Path | None:
     dest = archive / "siros" / "diario" / f"diario_{now:%Y-%m-%d}.csv.gz"
     if dest.exists():
         return None
-    # a série datada é estável (publicada ~08Z); diario.csv é o fallback
+    # a série datada é estável, mas só é publicada ~08Z: antes disso o arquivo do dia (UTC) dá 404
+    # e não vale tentar de novo nem cair no diario.csv (o WAF da ANAC o rejeita).
+    url = SIROS_DIARIO_SERIE.format(year=now.year, day=f"{now:%Y-%m-%d}")
     try:
-        raw = fetch(SIROS_DIARIO_SERIE.format(year=now.year, day=f"{now:%Y-%m-%d}"), timeout=180, retries=2)
+        raw = fetch(url, timeout=180, retries=1)
     except Exception as e:  # noqa: BLE001
+        if "404" in repr(e):
+            log(f"siros diário {now:%Y-%m-%d} ainda não publicado (404); tento na próxima captura")
+            return None
         log(f"siros série {now:%Y-%m-%d} indisponível ({e!r}); tentando diario.csv")
         raw = fetch(SIROS_DIARIO_URL, timeout=180)
     dest.parent.mkdir(parents=True, exist_ok=True)
